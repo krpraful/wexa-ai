@@ -8,6 +8,7 @@
  * Modification History:
  * - 04/08/2026 : Initial React layout assembly with CognoDB status checking
  * - 04/08/2026 : Added Footer component with developer details and prafulkr.xyz link
+ * - 04/08/2026 : Added safe response status checks to handle proxy errors gracefully
  *
  * Notes:
  * - Manages graph visualizer, fraud workbench, and SQL vs Graph explainer views.
@@ -31,10 +32,14 @@ export default function App() {
   const fetchHealth = async () => {
     try {
       const res = await fetch('/api/health');
+      if (!res.ok) {
+        setDbStatus({ status: 'DISCONNECTED', error: 'Express API server offline on port 3098 (run npm run dev)' });
+        return;
+      }
       const data = await res.json();
       setDbStatus(data);
     } catch (err) {
-      setDbStatus({ status: 'DISCONNECTED', error: err.message });
+      setDbStatus({ status: 'DISCONNECTED', error: 'Express API server offline on port 3098 (run npm run dev)' });
     }
   };
 
@@ -42,11 +47,13 @@ export default function App() {
     setLoading(true);
     try {
       const res = await fetch('/api/graph');
-      const data = await res.json();
-      setGraphData({
-        nodes: data.nodes || [],
-        relationships: data.relationships || []
-      });
+      if (res.ok) {
+        const data = await res.json();
+        setGraphData({
+          nodes: data.nodes || [],
+          relationships: data.relationships || []
+        });
+      }
     } catch (err) {
       console.error('Error fetching graph dataset:', err);
     } finally {

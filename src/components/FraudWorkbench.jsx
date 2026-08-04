@@ -7,6 +7,7 @@
  *
  * Modification History:
  * - 04/08/2026 : Preset query runners for 4-hop circular loops, UBO chains, and shared infrastructure
+ * - 04/08/2026 : Added safe response status checking for fetch calls
  *
  * Notes:
  * - Displays parameterised openCypher code and raw Neo4j execution parameters.
@@ -65,10 +66,13 @@ RETURN a1, infra, a2, labels(infra)[0] AS infraType`,
     const preset = PRESET_QUERIES[key];
     try {
       const res = await fetch(preset.endpoint);
+      if (!res.ok) {
+        throw new Error('API server offline on port 3098 (run npm run dev)');
+      }
       const data = await res.json();
       setQueryResult(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Unable to connect to Express API server');
     } finally {
       setLoading(false);
     }

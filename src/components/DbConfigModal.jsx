@@ -1,9 +1,17 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: src/components/DbConfigModal.jsx - CognoDB Cloud Connection Guidance Modal
- */
+/* ==============================================================
+ * Script: src/components/DbConfigModal.jsx
+ * Purpose: CognoDB Cloud Connection Guidance Modal displaying live credentials
+ *          and instructions for database configuration.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Initial modal implementation
+ * - 04/08/2026 : Updated with live CognoDB instance URI & password parameters
+ *
+ * Notes:
+ * - Displays active CognoDB status and environment variable guidelines.
+ * ============================================================== */
 
 import React from 'react';
 import { X, ExternalLink, Database, CheckCircle, AlertTriangle, Key, Terminal } from 'lucide-react';
@@ -50,12 +58,12 @@ export default function DbConfigModal({ isOpen, onClose, dbStatus }) {
             )}
             <div>
               <div className="text-xs font-bold uppercase tracking-wider">
-                Status: {isConnected ? 'Connected to CognoDB Cloud' : 'Operating in Pre-Loaded Demo Mode'}
+                Status: {isConnected ? 'Connected to CognoDB Cloud (Live)' : 'Operating in Pre-Loaded Demo Mode'}
               </div>
               <div className="text-xs opacity-80 mt-0.5">
                 {isConnected
-                  ? `URI: ${dbStatus.uri || 'Connected'}`
-                  : (dbStatus?.error || 'Database environment variables not configured.')}
+                  ? `URI: ${dbStatus.uri || 'bolt+s://db-1716681d.databases.cognodb.com'}`
+                  : (dbStatus?.error || 'Database connection offline.')}
               </div>
             </div>
           </div>
@@ -63,30 +71,29 @@ export default function DbConfigModal({ isOpen, onClose, dbStatus }) {
 
         {/* Instructions */}
         <div className="space-y-4 text-xs text-slate-300">
-          <h4 className="font-bold text-slate-200 uppercase tracking-wider">How to connect your CognoDB Cloud instance:</h4>
+          <h4 className="font-bold text-slate-200 uppercase tracking-wider">CognoDB Cloud Instance Details:</h4>
           
           <ol className="space-y-3 list-decimal list-inside">
             <li className="space-y-1">
-              <span>Sign up for a free instance at </span>
+              <span>Instance Console Overview: </span>
               <a
-                href="https://console.cognodb.com/signup"
+                href="https://console.cognodb.com/overview"
                 target="_blank"
                 rel="noreferrer"
                 className="text-indigo-400 hover:underline font-semibold inline-flex items-center gap-1"
               >
-                console.cognodb.com <ExternalLink className="w-3 h-3" />
+                console.cognodb.com/overview <ExternalLink className="w-3 h-3" />
               </a>
             </li>
-            <li>Create a free <strong>(c0)</strong> database instance.</li>
-            <li>Copy your connection URI (<code className="text-indigo-300 font-mono">bolt+s://&lt;instance-id&gt;.databases.cognodb.cloud</code>) and generated password.</li>
-            <li>Open or create the <code className="text-indigo-300 font-mono">.env</code> file in the project root directory and set:</li>
+            <li>Database Instance URI: <code className="text-indigo-300 font-mono">bolt+s://db-1716681d.databases.cognodb.com</code></li>
+            <li>Your <code className="text-indigo-300 font-mono">.env</code> configuration file contains:</li>
           </ol>
 
           <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-indigo-300 space-y-1">
-            <div>COGNO_URI=bolt+s://your-instance-id.databases.cognodb.cloud</div>
+            <div>COGNO_URI=bolt+s://db-1716681d.databases.cognodb.com</div>
             <div>COGNO_USER=cognodb</div>
-            <div>COGNO_PASSWORD=2BWqSfgfwy96kxh</div>
-            <div>PORT=3001</div>
+            <div>COGNO_PASSWORD=d8e12e783a014cc72f2492ced38743d9</div>
+            <div>PORT=3098</div>
           </div>
 
           <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between text-slate-400">
