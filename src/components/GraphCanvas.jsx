@@ -7,7 +7,7 @@
  *
  * Modification History:
  * - 04/08/2026 : Cytoscape canvas integration with risk level highlighting & node inspector
- * - 04/08/2026 : Added memoized dataset references (useMemo) to prevent Cytoscape re-destruction loops
+ * - 04/08/2026 : Refactored Cytoscape selectors to standard property mappers for 100% reliable rendering
  *
  * Notes:
  * - Color codes nodes by type (Person, Company, Account, Address, IP, Device).
@@ -75,7 +75,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [layoutName, setLayoutName] = useState('breadthfirst');
 
-  // Stable memoized nodes dataset to prevent Cytoscape re-creation loops
+  // Stable memoized nodes dataset
   const activeNodes = useMemo(() => {
     if (graphData && Array.isArray(graphData.nodes) && graphData.nodes.length > 0) {
       return graphData.nodes;
@@ -145,23 +145,52 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
           {
             selector: 'node',
             style: {
-              'background-color': function(ele) {
-                const type = ele.data('nodeType');
-                if (ele.data('isSanctioned')) return '#ef4444'; // Red for sanctioned
-                return NODE_COLORS[type] || '#94a3b8';
-              },
+              'width': 34,
+              'height': 34,
               'label': 'data(label)',
               'color': '#f8fafc',
               'font-size': '10px',
               'font-family': 'Inter, sans-serif',
-              'font-weight': 600,
+              'font-weight': '600',
               'text-valign': 'bottom',
               'text-margin-y': 6,
-              'width': ele => ele.data('isSanctioned') ? 42 : (ele.data('isHighRisk') ? 36 : 28),
-              'height': ele => ele.data('isSanctioned') ? 42 : (ele.data('isHighRisk') ? 36 : 28),
-              'border-width': ele => (ele.data('isSanctioned') || ele.data('isHighRisk')) ? 3 : 1,
-              'border-color': ele => ele.data('isSanctioned') ? '#dc2626' : (ele.data('isHighRisk') ? '#f59e0b' : 'rgba(255,255,255,0.2)'),
-              'overlay-padding': '4px'
+              'background-color': '#34d399',
+              'border-width': 2,
+              'border-color': 'rgba(255, 255, 255, 0.3)'
+            }
+          },
+          {
+            selector: 'node[nodeType = "Person"]',
+            style: { 'background-color': '#818cf8' }
+          },
+          {
+            selector: 'node[nodeType = "Company"]',
+            style: { 'background-color': '#fbbf24' }
+          },
+          {
+            selector: 'node[nodeType = "Account"]',
+            style: { 'background-color': '#34d399' }
+          },
+          {
+            selector: 'node[nodeType = "Address"]',
+            style: { 'background-color': '#f43f5e' }
+          },
+          {
+            selector: 'node[nodeType = "IPAddress"]',
+            style: { 'background-color': '#c084fc' }
+          },
+          {
+            selector: 'node[nodeType = "Device"]',
+            style: { 'background-color': '#38bdf8' }
+          },
+          {
+            selector: 'node[isSanctioned = true]',
+            style: {
+              'background-color': '#ef4444',
+              'border-width': 4,
+              'border-color': '#dc2626',
+              'width': 44,
+              'height': 44
             }
           },
           {
@@ -177,11 +206,11 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
             selector: 'edge',
             style: {
               'width': 2,
-              'line-color': 'rgba(148, 163, 184, 0.4)',
-              'target-arrow-color': 'rgba(148, 163, 184, 0.6)',
+              'line-color': 'rgba(148, 163, 184, 0.5)',
+              'target-arrow-color': 'rgba(148, 163, 184, 0.7)',
               'target-arrow-shape': 'triangle',
               'curve-style': 'bezier',
-              'label': ele => ele.data('amount') ? `${ele.data('label')} (${ele.data('amount')})` : ele.data('label'),
+              'label': 'data(label)',
               'font-size': '8px',
               'color': '#94a3b8',
               'text-rotation': 'autorotate',
@@ -191,7 +220,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
           {
             selector: 'edge[type = "TRANSFERRED"]',
             style: {
-              'line-color': 'rgba(52, 211, 153, 0.6)',
+              'line-color': 'rgba(52, 211, 153, 0.7)',
               'target-arrow-color': '#34d399',
               'width': 2.5
             }
@@ -199,7 +228,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
           {
             selector: 'edge[type = "BENEFICIAL_OWNER"]',
             style: {
-              'line-color': 'rgba(251, 191, 36, 0.6)',
+              'line-color': 'rgba(251, 191, 36, 0.7)',
               'target-arrow-color': '#fbbf24',
               'line-style': 'dashed'
             }
