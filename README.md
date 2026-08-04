@@ -7,9 +7,48 @@
 
 ---
 
+## 🖼️ Application Screenshots & Live Visualizations
+
+### 1. Network Visualizer (Tree Layout)
+*Real-time interactive Cytoscape.js network visualizer displaying 4-hop circular money laundering loops, shell company UBO chains, and synthetic identity clusters connected to live CognoDB Cloud.*
+
+![Network Visualizer - Tree Layout](docs/images/tree_layout_graph.png)
+
+---
+
+### 2. Full Network Topology View
+*Comprehensive entity topology graph displaying all 32 nodes and 21 relationships across Accounts, Persons, Companies, Addresses, IP Addresses, and Devices.*
+
+![Full Network Graph View](docs/images/full_network_graph.png)
+
+---
+
+### 3. Concentric Rings Layout
+*Alternative concentric ring layout highlighting central transaction hubs, IP proxies, and multi-tier ownership depth.*
+
+![Concentric Rings Layout](docs/images/concentric_rings_graph.png)
+
+---
+
+## ☁️ CognoDB Cloud Managed Graph Database Instance
+
+### 4. CognoDB Console Instance Overview (`db-1716681d`)
+*Live instance overview on `console.cognodb.com` showing 32 Nodes, 21 Relationships, active connections, and `bolt+s://db-1716681d.databases.cognodb.com:7687` connection endpoint.*
+
+![CognoDB Console Overview](docs/images/cognodb_console_overview.png)
+
+---
+
+### 5. CognoDB Instance Performance & Traffic Metrics
+*Real-time traffic metrics showing open database connections, queries per second (QPS), and active transactions.*
+
+![CognoDB Instance Metrics](docs/images/cognodb_console_metrics.png)
+
+---
+
 ## 📌 Why "Cypher Fraud Workbench" & "Why Graph Database?" Features Were Included
 
-These two application features directly fulfill the core evaluation criteria set out in the **Wexa AI Take-Home Assignment Document (`954b5d66-2f75-47a6-b18e-0f004c82a7e3.pdf`)**:
+These application features directly fulfill the core evaluation criteria set out in the **Wexa AI Take-Home Assignment Document (`954b5d66-2f75-47a6-b18e-0f004c82a7e3.pdf`)**:
 
 ### 1. `"Why Graph Database?"` (Explainer Section)
 - **Assignment Requirement (Section 4)**:  
@@ -26,7 +65,7 @@ These two application features directly fulfill the core evaluation criteria set
 
 ---
 
-## 🕸️ 1. Use Case: Anti-Money Laundering (AML) & UBO Tracing
+## 🕸️ Anti-Money Laundering (AML) & UBO Tracing Use Case
 
 Financial networks are inherently graph-structured. Traditional relational databases struggle to uncover complex multi-hop financial crimes because join operations scale exponentially with path depth ($O(N^k)$). **NexusAML** models entities as a property graph in **CognoDB Cloud** to perform real-time pattern detection across 3 financial crime typologies:
 
@@ -36,7 +75,7 @@ Financial networks are inherently graph-structured. Traditional relational datab
 
 ---
 
-## 📊 2. Graph Data Model
+## 📊 Graph Data Model
 
 ```mermaid
 graph TD
@@ -59,7 +98,7 @@ graph TD
 
 ---
 
-## 🚀 3. Quick Start & Execution Guide
+## 🚀 Quick Start & Execution Guide
 
 ```bash
 # 1. Clone repository
@@ -82,7 +121,7 @@ npm run dev
 
 ---
 
-## 👤 Developer Details
+## 👤 Developer & Ownership Details
 
 - **Author**: Praful Kumar
 - **Email**: [jobspraful@gmail.com](mailto:jobspraful@gmail.com)
