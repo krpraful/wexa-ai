@@ -1,14 +1,14 @@
 /* ==============================================================
  * Script: src/App.jsx
  * Purpose: Main application container, active tab router, top-level state manager,
- *          and error boundary fallback integration.
+ *          and error boundary fallback integration with periodic health polling.
  * Author: Praful Kumar
  * Created On: 04/08/2026
  *
  * Modification History:
  * - 04/08/2026 : Initial React layout assembly with CognoDB status checking
  * - 04/08/2026 : Added Footer component with developer details and prafulkr.xyz link
- * - 04/08/2026 : Added safe response status checks and React Error Boundary wrapper
+ * - 04/08/2026 : Added periodic health polling (every 5s) to guarantee live CognoDB status pill
  *
  * Notes:
  * - Manages graph visualizer, fraud workbench, and SQL vs Graph explainer views.
@@ -102,6 +102,10 @@ function MainContent() {
   useEffect(() => {
     fetchHealth();
     fetchGraphData();
+
+    // Poll health status every 5 seconds to keep CognoDB status pill updated
+    const interval = setInterval(fetchHealth, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
