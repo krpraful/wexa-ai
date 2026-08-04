@@ -7,7 +7,7 @@
  *
  * Modification History:
  * - 04/08/2026 : Implemented REST endpoints for graph topology & AML detection
- * - 04/08/2026 : Updated API server port to 3098
+ * - 04/08/2026 : Fixed node ID mapping to map Neo4j internal node identity to property IDs
  *
  * Notes:
  * - CORS enabled; handles graceful connection errors if database is unreachable.
@@ -111,30 +111,43 @@ app.get('/api/graph', async (req, res) => {
     const records = await executeCypher(QUERIES.GET_FULL_GRAPH.cypher, QUERIES.GET_FULL_GRAPH.params);
     const formatted = formatRecords(records);
 
-    // Extract unique nodes and relationships
     const nodesMap = new Map();
     const relsMap = new Map();
+    const internalIdToPropertyId = new Map();
 
+    // Map nodes and build lookup dictionary from internal identity -> property ID
     formatted.forEach(item => {
-      if (item.n && item.n.id) {
-        nodesMap.set(item.n.id, {
-          id: item.n.id,
+      if (item.n) {
+        const propId = item.n.properties?.id || item.n.id;
+        const internalId = String(item.n.id);
+        internalIdToPropertyId.set(internalId, propId);
+        nodesMap.set(propId, {
+          id: propId,
           label: item.n.labels ? item.n.labels[0] : 'Entity',
           ...item.n.properties
         });
       }
-      if (item.m && item.m.id) {
-        nodesMap.set(item.m.id, {
-          id: item.m.id,
+      if (item.m) {
+        const propId = item.m.properties?.id || item.m.id;
+        const internalId = String(item.m.id);
+        internalIdToPropertyId.set(internalId, propId);
+        nodesMap.set(propId, {
+          id: propId,
           label: item.m.labels ? item.m.labels[0] : 'Entity',
           ...item.m.properties
         });
       }
+    });
+
+    // Map relationships with resolved target/source property IDs
+    formatted.forEach(item => {
       if (item.r && item.r.id) {
+        const sourcePropId = internalIdToPropertyId.get(String(item.r.startNodeId)) || item.r.startNodeId;
+        const targetPropId = internalIdToPropertyId.get(String(item.r.endNodeId)) || item.r.endNodeId;
         relsMap.set(item.r.id, {
           id: item.r.id,
-          source: item.r.startNodeId || item.n?.id,
-          target: item.r.endNodeId || item.m?.id,
+          source: sourcePropId,
+          target: targetPropId,
           type: item.r.type,
           ...item.r.properties
         });
