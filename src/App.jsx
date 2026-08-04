@@ -1,11 +1,13 @@
 /* ==============================================================
  * Script: src/App.jsx
- * Purpose: Main application container, active tab router, and top-level state manager.
+ * Purpose: Main application container, active tab router, top-level state manager,
+ *          and footer integration.
  * Author: Praful Kumar
  * Created On: 04/08/2026
  *
  * Modification History:
  * - 04/08/2026 : Initial React layout assembly with CognoDB status checking
+ * - 04/08/2026 : Added Footer component with developer details and prafulkr.xyz link
  *
  * Notes:
  * - Manages graph visualizer, fraud workbench, and SQL vs Graph explainer views.
@@ -17,6 +19,7 @@ import GraphCanvas from './components/GraphCanvas';
 import FraudWorkbench from './components/FraudWorkbench';
 import SqlVsGraphExplainer from './components/SqlVsGraphExplainer';
 import DbConfigModal from './components/DbConfigModal';
+import Footer from './components/Footer';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('visualizer'); // 'visualizer' | 'workbench' | 'explainer'
@@ -65,7 +68,7 @@ export default function App() {
         onOpenConfig={() => setIsConfigOpen(true)}
       />
 
-      <main className="flex-1 relative">
+      <main className="flex-1 relative pb-8">
         {activeTab === 'visualizer' && (
           <GraphCanvas
             graphData={graphData}
@@ -82,6 +85,8 @@ export default function App() {
           <SqlVsGraphExplainer />
         )}
       </main>
+
+      <Footer />
 
       <DbConfigModal
         isOpen={isConfigOpen}
