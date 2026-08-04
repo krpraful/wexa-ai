@@ -1,9 +1,16 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: server/queries.js - Parameterised Cypher Query Registry & Benchmark Documentation
- */
+/* ==============================================================
+ * Script: server/queries.js
+ * Purpose: Central openCypher query registry for multi-hop money laundering detection,
+ *          UBO shell company tracing, synthetic identity discovery, and SQL comparison docs.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Added parameterised Cypher queries for 4-hop circular loops and UBO chains
+ *
+ * Notes:
+ * - Queries are parameterised ($limit, $accountId) to eliminate Cypher injection risks.
+ * ============================================================== */
 
 export const QUERIES = {
   // Fetch overall network topology (Nodes & Relationships) for interactive graph explorer

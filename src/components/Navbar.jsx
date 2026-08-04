@@ -1,9 +1,16 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: src/components/Navbar.jsx - Header Navigation & CognoDB Status Indicator
- */
+/* ==============================================================
+ * Script: src/components/Navbar.jsx
+ * Purpose: Top header bar providing navigation tabs, logo branding, and 
+ *          live CognoDB Cloud database connection status indicator.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Initial Navbar setup with active tab triggers & DB modal button
+ *
+ * Notes:
+ * - Highlights connection state dynamically (Live vs Demo Mode).
+ * ============================================================== */
 
 import React from 'react';
 import { Network, ShieldAlert, Cpu, Database, Server, ExternalLink, HelpCircle } from 'lucide-react';

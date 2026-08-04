@@ -1,9 +1,17 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: server/db.js - CognoDB / Neo4j Bolt Driver Connection & Session Management
- */
+/* ==============================================================
+ * Script: server/db.js
+ * Purpose: CognoDB / Neo4j Bolt Driver connection management, connection health 
+ *          verification, and parameterised Cypher query execution helper routines.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Initial implementation of CognoDB connection pool & formatting
+ *
+ * Notes:
+ * - Reads COGNO_URI, COGNO_USER, and COGNO_PASSWORD securely from process.env.
+ * - Converts Neo4j driver integers and node/relationship record objects into clean JSON.
+ * ============================================================== */
 
 import neo4j from 'neo4j-driver';
 import dotenv from 'dotenv';

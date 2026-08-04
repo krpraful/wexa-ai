@@ -1,9 +1,15 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: src/App.jsx - Main Application Container & Tab Router
- */
+/* ==============================================================
+ * Script: src/App.jsx
+ * Purpose: Main application container, active tab router, and top-level state manager.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Initial React layout assembly with CognoDB status checking
+ *
+ * Notes:
+ * - Manages graph visualizer, fraud workbench, and SQL vs Graph explainer views.
+ * ============================================================== */
 
 import React, { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';

@@ -1,9 +1,16 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: server/index.js - Express API Server Entrypoint & Route Handlers
- */
+/* ==============================================================
+ * Script: server/index.js
+ * Purpose: Express API server endpoints providing live CognoDB graph traversal API
+ *          routes and fallback demo data handler for non-technical evaluation.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Implemented REST endpoints for graph topology & AML detection
+ *
+ * Notes:
+ * - CORS enabled; handles graceful connection errors if database is unreachable.
+ * ============================================================== */
 
 import express from 'express';
 import cors from 'cors';
@@ -77,7 +84,7 @@ app.get('/api/health', async (req, res) => {
   res.json({
     status: status.isConnected ? 'CONNECTED' : 'DISCONNECTED',
     driver: 'neo4j-driver (openCypher / Bolt)',
-    developer: 'Praful (jobspraful@gmail.com)',
+    author: 'Praful Kumar (jobspraful@gmail.com)',
     uri: connState.uri,
     user: connState.user,
     error: status.error || null,

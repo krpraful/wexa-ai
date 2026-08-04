@@ -1,9 +1,16 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: src/components/FraudWorkbench.jsx - Cypher Fraud Detection & Query Executor Suite
- */
+/* ==============================================================
+ * Script: src/components/FraudWorkbench.jsx
+ * Purpose: Cypher query execution workbench interface allowing non-technical users
+ *          to trigger multi-hop Cypher queries and inspect parameters & returned paths.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Preset query runners for 4-hop circular loops, UBO chains, and shared infrastructure
+ *
+ * Notes:
+ * - Displays parameterised openCypher code and raw Neo4j execution parameters.
+ * ============================================================== */
 
 import React, { useState } from 'react';
 import { Play, Code, ShieldAlert, Cpu, Layers, Link, CheckCircle2, ChevronRight, AlertCircle, Sparkles } from 'lucide-react';

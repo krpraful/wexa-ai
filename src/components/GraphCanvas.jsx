@@ -1,9 +1,16 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: src/components/GraphCanvas.jsx - Cytoscape Network Visualizer Component
- */
+/* ==============================================================
+ * Script: src/components/GraphCanvas.jsx
+ * Purpose: Cytoscape.js interactive network visualizer component featuring node
+ *          color coding, entity selection drawer, search filters, and tree/ring layout algorithms.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Cytoscape canvas integration with risk level highlighting & node inspector
+ *
+ * Notes:
+ * - Color codes nodes by type (Person, Company, Account, Address, IP, Device).
+ * ============================================================== */
 
 import React, { useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';

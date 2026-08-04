@@ -1,9 +1,16 @@
-/**
- * Developer: Praful (jobspraful@gmail.com)
- * Application: NexusAML - Financial Crime & Graph Intelligence Application
- * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
- * File: scripts/seed.js - Graph Database Population & Reset Script
- */
+/* ==============================================================
+ * Script: scripts/seed.js
+ * Purpose: Graph database reset and seeding script using official Neo4j Bolt driver
+ *          to populate CognoDB Cloud with realistic AML financial network nodes & paths.
+ * Author: Praful Kumar
+ * Created On: 04/08/2026
+ *
+ * Modification History:
+ * - 04/08/2026 : Added 4-hop circular money laundering, UBO shell chains, and synthetic rings
+ *
+ * Notes:
+ * - Executable via 'npm run seed'. Reads COGNO_URI and COGNO_PASSWORD from .env.
+ * ============================================================== */
 
 import neo4j from 'neo4j-driver';
 import dotenv from 'dotenv';
