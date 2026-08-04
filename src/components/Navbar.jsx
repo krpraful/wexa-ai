@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: src/components/Navbar.jsx - Header Navigation & CognoDB Status Indicator
+ */
+
 import React from 'react';
 import { Network, ShieldAlert, Cpu, Database, Server, ExternalLink, HelpCircle } from 'lucide-react';
 

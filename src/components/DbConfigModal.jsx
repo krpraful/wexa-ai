@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: src/components/DbConfigModal.jsx - CognoDB Cloud Connection Guidance Modal
+ */
+
 import React from 'react';
 import { X, ExternalLink, Database, CheckCircle, AlertTriangle, Key, Terminal } from 'lucide-react';
 
@@ -78,7 +85,7 @@ export default function DbConfigModal({ isOpen, onClose, dbStatus }) {
           <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-indigo-300 space-y-1">
             <div>COGNO_URI=bolt+s://your-instance-id.databases.cognodb.cloud</div>
             <div>COGNO_USER=cognodb</div>
-            <div>COGNO_PASSWORD=your_saved_password</div>
+            <div>COGNO_PASSWORD=2BWqSfgfwy96kxh</div>
             <div>PORT=3001</div>
           </div>
 

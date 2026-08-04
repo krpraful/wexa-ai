@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: scripts/seed.js - Graph Database Population & Reset Script
+ */
+
 import neo4j from 'neo4j-driver';
 import dotenv from 'dotenv';
 

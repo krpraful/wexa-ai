@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: src/components/SqlVsGraphExplainer.jsx - "Why a Graph Database?" Comparison View
+ */
+
 import React from 'react';
 import { Cpu, Zap, Database, ArrowRight, ShieldCheck, CheckCircle, XCircle, Code, Layers } from 'lucide-react';
 

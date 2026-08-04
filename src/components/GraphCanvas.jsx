@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: src/components/GraphCanvas.jsx - Cytoscape Network Visualizer Component
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
 import { Search, RefreshCw, ZoomIn, ZoomOut, Maximize2, Shield, AlertTriangle, User, Building, CreditCard, MapPin, Globe, Smartphone, ChevronRight, Info } from 'lucide-react';

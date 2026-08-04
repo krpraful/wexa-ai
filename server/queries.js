@@ -1,7 +1,8 @@
 /**
- * NexusAML Cypher Query Registry
- * All queries are strictly parameterised using standard openCypher syntax
- * compatible with CognoDB Cloud & Neo4j Bolt Driver.
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: server/queries.js - Parameterised Cypher Query Registry & Benchmark Documentation
  */
 
 export const QUERIES = {

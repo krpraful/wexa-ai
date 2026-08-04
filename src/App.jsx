@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: src/App.jsx - Main Application Container & Tab Router
+ */
+
 import React, { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
 import GraphCanvas from './components/GraphCanvas';

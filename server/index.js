@@ -1,3 +1,10 @@
+/**
+ * Developer: Praful (jobspraful@gmail.com)
+ * Application: NexusAML - Financial Crime & Graph Intelligence Application
+ * Assignment: Wexa AI Take-Home Assignment (CognoDB + openCypher)
+ * File: server/index.js - Express API Server Entrypoint & Route Handlers
+ */
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -70,6 +77,7 @@ app.get('/api/health', async (req, res) => {
   res.json({
     status: status.isConnected ? 'CONNECTED' : 'DISCONNECTED',
     driver: 'neo4j-driver (openCypher / Bolt)',
+    developer: 'Praful (jobspraful@gmail.com)',
     uri: connState.uri,
     user: connState.user,
     error: status.error || null,
