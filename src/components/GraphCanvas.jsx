@@ -7,7 +7,7 @@
  *
  * Modification History:
  * - 04/08/2026 : Cytoscape canvas integration with risk level highlighting & node inspector
- * - 04/08/2026 : Refactored Cytoscape selectors to standard property mappers for 100% reliable rendering
+ * - 04/08/2026 : Directly set data.color property for guaranteed distinct entity node colors
  *
  * Notes:
  * - Color codes nodes by type (Person, Company, Account, Address, IP, Device).
@@ -104,16 +104,24 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
         const isSanctioned = node.isSanctioned === true;
         const isShell = node.isShellCompany === true;
         const isHighRisk = (node.riskScore || 0) > 75;
+        const nodeType = node.label || 'Entity';
+
+        // Explicit hex color mapping per node type
+        let color = NODE_COLORS[nodeType] || '#34d399';
+        if (isSanctioned) {
+          color = '#ef4444'; // Red for sanctioned entities
+        }
 
         elements.push({
           data: {
             id: String(node.id),
             label: node.name || node.accountNumber || node.ip || node.street || node.deviceFingerprint || node.id,
-            nodeType: node.label || 'Entity',
+            nodeType,
             riskScore: node.riskScore || 0,
             isSanctioned,
             isShell,
             isHighRisk,
+            color,
             properties: node
           }
         });
@@ -145,8 +153,8 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
           {
             selector: 'node',
             style: {
-              'width': 34,
-              'height': 34,
+              'width': 36,
+              'height': 36,
               'label': 'data(label)',
               'color': '#f8fafc',
               'font-size': '10px',
@@ -154,43 +162,9 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
               'font-weight': '600',
               'text-valign': 'bottom',
               'text-margin-y': 6,
-              'background-color': '#34d399',
+              'background-color': 'data(color)',
               'border-width': 2,
-              'border-color': 'rgba(255, 255, 255, 0.3)'
-            }
-          },
-          {
-            selector: 'node[nodeType = "Person"]',
-            style: { 'background-color': '#818cf8' }
-          },
-          {
-            selector: 'node[nodeType = "Company"]',
-            style: { 'background-color': '#fbbf24' }
-          },
-          {
-            selector: 'node[nodeType = "Account"]',
-            style: { 'background-color': '#34d399' }
-          },
-          {
-            selector: 'node[nodeType = "Address"]',
-            style: { 'background-color': '#f43f5e' }
-          },
-          {
-            selector: 'node[nodeType = "IPAddress"]',
-            style: { 'background-color': '#c084fc' }
-          },
-          {
-            selector: 'node[nodeType = "Device"]',
-            style: { 'background-color': '#38bdf8' }
-          },
-          {
-            selector: 'node[isSanctioned = true]',
-            style: {
-              'background-color': '#ef4444',
-              'border-width': 4,
-              'border-color': '#dc2626',
-              'width': 44,
-              'height': 44
+              'border-color': 'rgba(255, 255, 255, 0.4)'
             }
           },
           {
