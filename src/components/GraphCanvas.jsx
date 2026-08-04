@@ -7,13 +7,13 @@
  *
  * Modification History:
  * - 04/08/2026 : Cytoscape canvas integration with risk level highlighting & node inspector
- * - 04/08/2026 : Added defensive exception handling and guaranteed default dataset fallback
+ * - 04/08/2026 : Added memoized dataset references (useMemo) to prevent Cytoscape re-destruction loops
  *
  * Notes:
  * - Color codes nodes by type (Person, Company, Account, Address, IP, Device).
  * ============================================================== */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import cytoscape from 'cytoscape';
 import { Search, RefreshCw, ZoomIn, ZoomOut, Maximize2, Shield, AlertTriangle, User, Building, CreditCard, MapPin, Globe, Smartphone, ChevronRight, Info } from 'lucide-react';
 
@@ -75,9 +75,21 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [layoutName, setLayoutName] = useState('breadthfirst');
 
-  // Determine active nodes & relationships
-  const rawNodes = (graphData && Array.isArray(graphData.nodes) && graphData.nodes.length > 0) ? graphData.nodes : DEFAULT_FALLBACK_NODES;
-  const rawRels = (graphData && Array.isArray(graphData.relationships) && graphData.relationships.length > 0) ? graphData.relationships : DEFAULT_FALLBACK_RELS;
+  // Stable memoized nodes dataset to prevent Cytoscape re-creation loops
+  const activeNodes = useMemo(() => {
+    if (graphData && Array.isArray(graphData.nodes) && graphData.nodes.length > 0) {
+      return graphData.nodes;
+    }
+    return DEFAULT_FALLBACK_NODES;
+  }, [graphData?.nodes]);
+
+  // Stable memoized relationships dataset
+  const activeRels = useMemo(() => {
+    if (graphData && Array.isArray(graphData.relationships) && graphData.relationships.length > 0) {
+      return graphData.relationships;
+    }
+    return DEFAULT_FALLBACK_RELS;
+  }, [graphData?.relationships]);
 
   // Initialize Cytoscape network graph
   useEffect(() => {
@@ -87,7 +99,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
       // Convert API nodes and relationships into Cytoscape elements format
       const elements = [];
 
-      rawNodes.forEach(node => {
+      activeNodes.forEach(node => {
         if (!node || !node.id) return;
         const isSanctioned = node.isSanctioned === true;
         const isShell = node.isShellCompany === true;
@@ -107,7 +119,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
         });
       });
 
-      rawRels.forEach((rel, idx) => {
+      activeRels.forEach((rel, idx) => {
         if (rel && rel.source && rel.target) {
           elements.push({
             data: {
@@ -223,7 +235,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
         try { cyRef.current.destroy(); } catch (e) {}
       }
     };
-  }, [rawNodes, rawRels, layoutName]);
+  }, [activeNodes, activeRels, layoutName]);
 
   // Apply Search Filter safely
   useEffect(() => {
