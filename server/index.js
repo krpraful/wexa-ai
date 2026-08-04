@@ -7,6 +7,7 @@
  *
  * Modification History:
  * - 04/08/2026 : Implemented REST endpoints for graph topology & AML detection
+ * - 04/08/2026 : Updated API server port to 3098
  *
  * Notes:
  * - CORS enabled; handles graceful connection errors if database is unreachable.
@@ -21,7 +22,7 @@ import { QUERIES } from './queries.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3098;
 
 app.use(cors());
 app.use(express.json());

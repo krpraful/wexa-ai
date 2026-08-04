@@ -6,10 +6,10 @@
  *
  * Modification History:
  * - 04/08/2026 : Initial Vite config with React & Tailwind plugins
- * - 04/08/2026 : Updated dev server port to 3099
+ * - 04/08/2026 : Updated dev server port to 3099 and API proxy port to 3098
  *
  * Notes:
- * - Proxies /api requests to Express server running on port 3001.
+ * - Proxies /api requests to Express server running on port 3098.
  * ============================================================== */
 
 import { defineConfig } from 'vite';
@@ -25,7 +25,7 @@ export default defineConfig({
     port: 3099,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3098',
         changeOrigin: true
       }
     }
