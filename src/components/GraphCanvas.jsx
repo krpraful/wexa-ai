@@ -7,7 +7,7 @@
  *
  * Modification History:
  * - 04/08/2026 : Cytoscape canvas integration with risk level highlighting & node inspector
- * - 04/08/2026 : Added default fallback dataset & auto-resize/fit for guaranteed rendering
+ * - 04/08/2026 : Added defensive exception handling and guaranteed default dataset fallback
  *
  * Notes:
  * - Color codes nodes by type (Person, Company, Account, Address, IP, Device).
@@ -26,7 +26,7 @@ const NODE_COLORS = {
   Device: '#38bdf8'       // Sky
 };
 
-// Fallback dataset to guarantee visual rendering even before API fetch
+// Fallback dataset to guarantee visual rendering under all circumstances
 const DEFAULT_FALLBACK_NODES = [
   { id: 'PER-001', label: 'Person', name: 'Viktor Vance', riskScore: 98, isSanctioned: true, nationality: 'CYP' },
   { id: 'PER-002', label: 'Person', name: 'Elena Rostova', riskScore: 88, isSanctioned: false, nationality: 'MLT' },
@@ -73,189 +73,200 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
   const [selectedNode, setSelectedNode] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('ALL');
-  const [layoutName, setLayoutName] = useState('concentric');
+  const [layoutName, setLayoutName] = useState('breadthfirst');
 
   // Determine active nodes & relationships
-  const rawNodes = (graphData && graphData.nodes && graphData.nodes.length > 0) ? graphData.nodes : DEFAULT_FALLBACK_NODES;
-  const rawRels = (graphData && graphData.relationships && graphData.relationships.length > 0) ? graphData.relationships : DEFAULT_FALLBACK_RELS;
+  const rawNodes = (graphData && Array.isArray(graphData.nodes) && graphData.nodes.length > 0) ? graphData.nodes : DEFAULT_FALLBACK_NODES;
+  const rawRels = (graphData && Array.isArray(graphData.relationships) && graphData.relationships.length > 0) ? graphData.relationships : DEFAULT_FALLBACK_RELS;
 
   // Initialize Cytoscape network graph
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Convert API nodes and relationships into Cytoscape elements format
-    const elements = [];
+    try {
+      // Convert API nodes and relationships into Cytoscape elements format
+      const elements = [];
 
-    rawNodes.forEach(node => {
-      const isSanctioned = node.isSanctioned === true;
-      const isShell = node.isShellCompany === true;
-      const isHighRisk = (node.riskScore || 0) > 75;
+      rawNodes.forEach(node => {
+        if (!node || !node.id) return;
+        const isSanctioned = node.isSanctioned === true;
+        const isShell = node.isShellCompany === true;
+        const isHighRisk = (node.riskScore || 0) > 75;
 
-      elements.push({
-        data: {
-          id: String(node.id),
-          label: node.name || node.accountNumber || node.ip || node.street || node.deviceFingerprint || node.id,
-          nodeType: node.label || 'Entity',
-          riskScore: node.riskScore || 0,
-          isSanctioned,
-          isShell,
-          isHighRisk,
-          properties: node
-        }
-      });
-    });
-
-    rawRels.forEach((rel, idx) => {
-      if (rel.source && rel.target) {
         elements.push({
           data: {
-            id: rel.id || `rel-${idx}`,
-            source: String(rel.source),
-            target: String(rel.target),
-            label: rel.type || 'CONNECTED',
-            amount: rel.amount ? `$${Number(rel.amount).toLocaleString()}` : '',
-            properties: rel
+            id: String(node.id),
+            label: node.name || node.accountNumber || node.ip || node.street || node.deviceFingerprint || node.id,
+            nodeType: node.label || 'Entity',
+            riskScore: node.riskScore || 0,
+            isSanctioned,
+            isShell,
+            isHighRisk,
+            properties: node
           }
         });
-      }
-    });
+      });
 
-    if (cyRef.current) {
-      cyRef.current.destroy();
+      rawRels.forEach((rel, idx) => {
+        if (rel && rel.source && rel.target) {
+          elements.push({
+            data: {
+              id: rel.id || `rel-${idx}`,
+              source: String(rel.source),
+              target: String(rel.target),
+              label: rel.type || 'CONNECTED',
+              amount: rel.amount ? `$${Number(rel.amount).toLocaleString()}` : '',
+              properties: rel
+            }
+          });
+        }
+      });
+
+      if (cyRef.current) {
+        try { cyRef.current.destroy(); } catch (e) {}
+      }
+
+      const cy = cytoscape({
+        container: containerRef.current,
+        elements,
+        style: [
+          {
+            selector: 'node',
+            style: {
+              'background-color': function(ele) {
+                const type = ele.data('nodeType');
+                if (ele.data('isSanctioned')) return '#ef4444'; // Red for sanctioned
+                return NODE_COLORS[type] || '#94a3b8';
+              },
+              'label': 'data(label)',
+              'color': '#f8fafc',
+              'font-size': '10px',
+              'font-family': 'Inter, sans-serif',
+              'font-weight': 600,
+              'text-valign': 'bottom',
+              'text-margin-y': 6,
+              'width': ele => ele.data('isSanctioned') ? 42 : (ele.data('isHighRisk') ? 36 : 28),
+              'height': ele => ele.data('isSanctioned') ? 42 : (ele.data('isHighRisk') ? 36 : 28),
+              'border-width': ele => (ele.data('isSanctioned') || ele.data('isHighRisk')) ? 3 : 1,
+              'border-color': ele => ele.data('isSanctioned') ? '#dc2626' : (ele.data('isHighRisk') ? '#f59e0b' : 'rgba(255,255,255,0.2)'),
+              'overlay-padding': '4px'
+            }
+          },
+          {
+            selector: 'node:selected',
+            style: {
+              'border-width': 4,
+              'border-color': '#6366f1',
+              'shadow-blur': 20,
+              'shadow-color': '#6366f1'
+            }
+          },
+          {
+            selector: 'edge',
+            style: {
+              'width': 2,
+              'line-color': 'rgba(148, 163, 184, 0.4)',
+              'target-arrow-color': 'rgba(148, 163, 184, 0.6)',
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier',
+              'label': ele => ele.data('amount') ? `${ele.data('label')} (${ele.data('amount')})` : ele.data('label'),
+              'font-size': '8px',
+              'color': '#94a3b8',
+              'text-rotation': 'autorotate',
+              'text-margin-y': -8
+            }
+          },
+          {
+            selector: 'edge[type = "TRANSFERRED"]',
+            style: {
+              'line-color': 'rgba(52, 211, 153, 0.6)',
+              'target-arrow-color': '#34d399',
+              'width': 2.5
+            }
+          },
+          {
+            selector: 'edge[type = "BENEFICIAL_OWNER"]',
+            style: {
+              'line-color': 'rgba(251, 191, 36, 0.6)',
+              'target-arrow-color': '#fbbf24',
+              'line-style': 'dashed'
+            }
+          }
+        ],
+        layout: {
+          name: layoutName || 'breadthfirst',
+          animate: false,
+          padding: 60
+        }
+      });
+
+      cy.on('tap', 'node', function(evt) {
+        const node = evt.target;
+        if (node && node.data) {
+          setSelectedNode(node.data());
+        }
+      });
+
+      cy.on('tap', function(evt) {
+        if (evt.target === cy) {
+          setSelectedNode(null);
+        }
+      });
+
+      cyRef.current = cy;
+    } catch (err) {
+      console.error('Cytoscape initialization error:', err);
     }
 
-    const cy = cytoscape({
-      container: containerRef.current,
-      elements,
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'background-color': function(ele) {
-              const type = ele.data('nodeType');
-              if (ele.data('isSanctioned')) return '#ef4444'; // Red for sanctioned
-              return NODE_COLORS[type] || '#94a3b8';
-            },
-            'label': 'data(label)',
-            'color': '#f8fafc',
-            'font-size': '10px',
-            'font-family': 'Inter, sans-serif',
-            'font-weight': 600,
-            'text-valign': 'bottom',
-            'text-margin-y': 6,
-            'width': ele => ele.data('isSanctioned') ? 42 : (ele.data('isHighRisk') ? 36 : 28),
-            'height': ele => ele.data('isSanctioned') ? 42 : (ele.data('isHighRisk') ? 36 : 28),
-            'border-width': ele => (ele.data('isSanctioned') || ele.data('isHighRisk')) ? 3 : 1,
-            'border-color': ele => ele.data('isSanctioned') ? '#dc2626' : (ele.data('isHighRisk') ? '#f59e0b' : 'rgba(255,255,255,0.2)'),
-            'overlay-padding': '4px'
-          }
-        },
-        {
-          selector: 'node:selected',
-          style: {
-            'border-width': 4,
-            'border-color': '#6366f1',
-            'shadow-blur': 20,
-            'shadow-color': '#6366f1'
-          }
-        },
-        {
-          selector: 'edge',
-          style: {
-            'width': 2,
-            'line-color': 'rgba(148, 163, 184, 0.4)',
-            'target-arrow-color': 'rgba(148, 163, 184, 0.6)',
-            'target-arrow-shape': 'triangle',
-            'curve-style': 'bezier',
-            'label': ele => ele.data('amount') ? `${ele.data('label')} (${ele.data('amount')})` : ele.data('label'),
-            'font-size': '8px',
-            'color': '#94a3b8',
-            'text-rotation': 'autorotate',
-            'text-margin-y': -8
-          }
-        },
-        {
-          selector: 'edge[type = "TRANSFERRED"]',
-          style: {
-            'line-color': 'rgba(52, 211, 153, 0.6)',
-            'target-arrow-color': '#34d399',
-            'width': 2.5
-          }
-        },
-        {
-          selector: 'edge[type = "BENEFICIAL_OWNER"]',
-          style: {
-            'line-color': 'rgba(251, 191, 36, 0.6)',
-            'target-arrow-color': '#fbbf24',
-            'line-style': 'dashed'
-          }
-        }
-      ],
-      layout: {
-        name: layoutName,
-        animate: false,
-        padding: 60
+    return () => {
+      if (cyRef.current) {
+        try { cyRef.current.destroy(); } catch (e) {}
       }
-    });
+    };
+  }, [rawNodes, rawRels, layoutName]);
 
-    cy.on('tap', 'node', function(evt) {
-      const node = evt.target;
-      setSelectedNode(node.data());
-    });
+  // Apply Search Filter safely
+  useEffect(() => {
+    if (!cyRef.current) return;
+    const cy = cyRef.current;
 
-    cy.on('tap', function(evt) {
-      if (evt.target === cy) {
-        setSelectedNode(null);
-      }
-    });
+    try {
+      cy.batch(() => {
+        cy.nodes().forEach(node => {
+          const data = node.data();
+          const matchesQuery = !searchQuery || 
+            (data.label && data.label.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (data.id && data.id.toLowerCase().includes(searchQuery.toLowerCase()));
+          const matchesType = activeFilter === 'ALL' || data.nodeType === activeFilter;
 
-    cyRef.current = cy;
+          if (matchesQuery && matchesType) {
+            node.style('display', 'element');
+          } else {
+            node.style('display', 'none');
+          }
+        });
+      });
+    } catch (err) {
+      console.error('Error applying node filters:', err);
+    }
+  }, [searchQuery, activeFilter]);
 
-    // Resize and fit after container layout calculation
-    const timer = setTimeout(() => {
+  const handleZoomIn = () => {
+    try { cyRef.current && cyRef.current.zoom(cyRef.current.zoom() * 1.25); } catch (e) {}
+  };
+
+  const handleZoomOut = () => {
+    try { cyRef.current && cyRef.current.zoom(cyRef.current.zoom() * 0.8); } catch (e) {}
+  };
+
+  const handleFit = () => {
+    try {
       if (cyRef.current) {
         cyRef.current.resize();
         cyRef.current.fit();
         cyRef.current.center();
       }
-    }, 150);
-
-    return () => {
-      clearTimeout(timer);
-      if (cyRef.current) cyRef.current.destroy();
-    };
-  }, [rawNodes, rawRels, layoutName]);
-
-  // Apply Search Filter
-  useEffect(() => {
-    if (!cyRef.current) return;
-    const cy = cyRef.current;
-
-    cy.batch(() => {
-      cy.nodes().forEach(node => {
-        const data = node.data();
-        const matchesQuery = !searchQuery || 
-          data.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          data.id.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesType = activeFilter === 'ALL' || data.nodeType === activeFilter;
-
-        if (matchesQuery && matchesType) {
-          node.style('display', 'element');
-        } else {
-          node.style('display', 'none');
-        }
-      });
-    });
-  }, [searchQuery, activeFilter]);
-
-  const handleZoomIn = () => cyRef.current && cyRef.current.zoom(cyRef.current.zoom() * 1.25);
-  const handleZoomOut = () => cyRef.current && cyRef.current.zoom(cyRef.current.zoom() * 0.8);
-  const handleFit = () => {
-    if (cyRef.current) {
-      cyRef.current.resize();
-      cyRef.current.fit();
-      cyRef.current.center();
-    }
+    } catch (e) {}
   };
 
   const getNodeIcon = (type) => {
@@ -271,10 +282,10 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
   };
 
   return (
-    <div className="relative w-full min-h-[600px] h-[calc(100vh-160px)] flex flex-col md:flex-row overflow-hidden bg-slate-950 border-b border-slate-800/80">
+    <div className="relative w-full h-[calc(100vh-140px)] min-h-[500px] flex flex-col md:flex-row overflow-hidden bg-slate-950">
       
       {/* Main Controls & Canvas Area */}
-      <div className="flex-1 flex flex-col relative h-full min-h-[550px]">
+      <div className="flex-1 flex flex-col relative h-full min-h-[450px]">
         
         {/* Top Control Toolbar */}
         <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
@@ -311,8 +322,8 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
               onChange={e => setLayoutName(e.target.value)}
               className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
             >
-              <option value="concentric">Concentric Rings</option>
               <option value="breadthfirst">Tree Layout</option>
+              <option value="concentric">Concentric Rings</option>
               <option value="circle">Circular Layout</option>
               <option value="grid">Grid Layout</option>
             </select>
@@ -364,7 +375,7 @@ export default function GraphCanvas({ graphData, loading, onRefresh }) {
         </div>
 
         {/* Cytoscape Container */}
-        <div ref={containerRef} className="w-full h-full min-h-[550px] cursor-grab active:cursor-grabbing block" />
+        <div ref={containerRef} className="w-full h-full min-h-[450px] cursor-grab active:cursor-grabbing block" />
       </div>
 
       {/* Node Inspector Drawer */}
